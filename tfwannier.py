@@ -110,10 +110,12 @@ plt.show()
 fbz_idxs = [i for i in range(len(karr)) if -0.5 <= karr[i] <= 0.5]
 
 n_fbz = np.zeros_like(Varr)
+n = np.zeros_like(Varr)
 
 for i, _ in enumerate(Varr):
 
     n_fbz[i] = sum(abs(FTwannier_functions[i][fbz_idxs])**2)
+    n[i] = sum(abs(FTwannier_functions[i][:])**2)
 
 
 fig, ax = plt.subplots()
@@ -122,8 +124,12 @@ ax.plot(
     sorted(uj_vs_s.keys()),
     n_fbz
     )
+ax.plot(
+    sorted(uj_vs_s.keys()),
+    n
+    )
 ax.set_xlabel('U/J')
-ax.set_ylabel(r'$\int _{\mathrm{FBZ}} \mathrm{d}\mathbf{k} |\omega (\mathbf{k})|$')
+ax.set_ylabel(r'$\int _{\mathrm{FBZ}} \mathrm{d}\mathbf{k} |\omega (\mathbf{k})|^2$')
 
 plt.show()
 
