@@ -35,11 +35,11 @@ s_vs_uj = {s: uj for (uj, s) in uj_vs_s.items()}
 #%%
 
 Varr = sorted(uj_vs_s.values())  # lattice depth in units of the recoil energy
-size = 5000  # number of lattice sites
+size = 100  # number of lattice sites
 qarr = lattice.quasimomenta(size)  # quasimomenta
 n = 0  # band index
 Npoint=500
-xrange=20
+xrange=100
 xarr = np.linspace(-xrange/2, xrange/2 ,Npoint)  # real-space position
 
 wannier_functions = []
@@ -90,15 +90,15 @@ for i in range(len(Varr)):
 karr=np.concatenate((-karr[::-1],karr[1:])) # to have a symmetric plot centered on k=0
 
 # plot the FTwannier_functions
-fig, axes = plt.subplots(1, len(Varr), figsize=(16, 2.5), sharey=True)
-for i, ax in enumerate(axes):
+fig, axes = plt.subplots(3, 4, figsize=(16, 2.5), sharey=True)
+for i, ax in enumerate(axes.flatten()):
     ax.plot(karr, np.abs(FTwannier_functions[i])**2)#,label='$s={}E_r$'.format(Varr[i]))
     # ax.plot(karr,np.exp(-karr**2*(4/np.sqrt(Varr[i]))),'--')#label='Approx. Gauss. $s={}E_r$'.format(Varr[0]))
     # ax.set_xlim(0,3)
     ax.set_xlabel('$k$ [$k_d$]')
     ax.grid()
     ax.text(.97, .9, f"U/J = {s_vs_uj[Varr[i]]}", textprops, transform=ax.transAxes)
-axes[0].set_ylabel("FT wannier density")
+axes.flatten()[0].set_ylabel("FT wannier density")
 plt.subplots_adjust(wspace=.1)
 #plt.ylabel('Density [a.u.]')
 
