@@ -54,15 +54,15 @@ for V in Varr:
 
 #%%
 
-fig, axes = plt.subplots(1, len(Varr), figsize=(14, 3), sharey=True)
-for i, ax in enumerate(axes):
-    ax.plot(xarr, wannier_functions[i])
-    ax.set_xlim(-2,2)
-    ax.set_xlabel("position")
-    ax.text(1, 1, f"U/J = {s_vs_uj[Varr[i]]}", textprops, transform=ax.transAxes)
-axes[0].set_ylabel("Wannier amplitude")
-plt.subplots_adjust(wspace=.1)
-plt.show()
+# fig, axes = plt.subplots(1, len(Varr), figsize=(14, 3), sharey=True)
+# for i, ax in enumerate(axes):
+#     ax.plot(xarr, wannier_functions[i])
+#     ax.set_xlim(-2,2)
+#     ax.set_xlabel("position")
+#     ax.text(1, 1, f"U/J = {s_vs_uj[Varr[i]]}", textprops, transform=ax.transAxes)
+# axes[0].set_ylabel("Wannier amplitude")
+# plt.subplots_adjust(wspace=.1)
+# plt.show()
 
 
 
@@ -71,8 +71,8 @@ plt.show()
 
 dx = xarr[1] - xarr[0]
 
-for wf in wannier_functions:
-    print("Norm: ", np.sum(wf**2) * dx)
+# for wf in wannier_functions:
+#     print("Norm: ", np.sum(wf**2) * dx)
 
 
 #%%
@@ -107,23 +107,60 @@ plt.show()
 
 #%%
 
+
+k_0_idx = np.where(karr==0)[0][0]
+k_bec_idxs = np.where([i.is_integer() for i in karr])[0]
 fbz_idxs = [i for i in range(len(karr)) if -0.5 <= karr[i] <= 0.5]
 
+
+n_0 = np.zeros_like(Varr)
+n_bec = np.zeros_like(Varr)
 n_fbz = np.zeros_like(Varr)
+n_tot = np.zeros_like(Varr)
+
 
 for i, _ in enumerate(Varr):
 
+    n_0[i] = abs(FTwannier_functions[i][k_0_idx])**2
+    n_bec[i] = sum(abs(FTwannier_functions[i][k_bec_idxs])**2)
     n_fbz[i] = sum(abs(FTwannier_functions[i][fbz_idxs])**2)
+    n_tot[i] = sum(abs(FTwannier_functions[i][:])**2)
+    
 
 
-fig, ax = plt.subplots()
+    
+#%%
 
-ax.plot(
+
+fig, axs = plt.subplots(1, 2)
+axs[0].plot(
     sorted(uj_vs_s.keys()),
-    n_fbz
+    n_0,
+    label=r'$N_0$'
     )
-ax.set_xlabel('U/J')
-ax.set_ylabel(r'$\int _{\mathrm{FBZ}} \mathrm{d}\mathbf{k} |\omega (\mathbf{k})|$')
+axs[0].plot(
+    sorted(uj_vs_s.keys()),
+    n_bec,
+    label=r'$N_{\mathrm{BEC}}$'
+    )
+axs[1].plot(
+    sorted(uj_vs_s.keys()),
+    n_fbz,
+    label=r'$N_{\mathrm{FBZ}}$'
+    )
+axs[1].plot(
+    sorted(uj_vs_s.keys()),
+    n_tot,
+    label=r'$N_{\mathrm{tot}}$'
+    )
+for ax in axs:
+    ax.set_xlabel('U/J')
+    ax.set_ylabel(r'$\int _{\mathrm{FBZ}} \mathrm{d}\mathbf{k} |\omega (\mathbf{k})|^2$')
+    ax.legend()
+    ax.set_axisbelow(True)    
+    ax.xaxis.grid(color='gray', linestyle='dashed', linewidth=0.3)
+    ax.yaxis.grid(color='gray', linestyle='dashed', linewidth=0.3)
+    ax.grid(visible=True)
 
 plt.show()
 
