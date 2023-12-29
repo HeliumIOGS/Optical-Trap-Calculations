@@ -105,28 +105,51 @@ plt.subplots_adjust(wspace=.1)
 plt.show()
 
 
-#%%
+# Calculate quantities:
 
+dk = karr[1] - karr[0]
 
 k_0_idx = np.where(karr==0)[0][0]
-k_bec_idxs = np.where([i.is_integer() for i in karr])[0]
-fbz_idxs = [i for i in range(len(karr)) if -0.5 <= karr[i] <= 0.5]
 
+k_bec_idxs = np.where([i.is_integer() for i in karr])[0]
+# Add composite peaks:
+    
+def find_nearest(array, value):
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    return array[idx]
+
+comp_peaks_1 = np.where([abs(i) == find_nearest(karr, np.sqrt(2)) for i in karr])[0]
+comp_peaks_2 = np.where([abs(i) == find_nearest(karr, np.sqrt(5)) for i in karr])[0]
+k_bec_idxs = np.append(k_bec_idxs, comp_peaks_1, 0)
+k_bec_idxs = np.append(k_bec_idxs, comp_peaks_2, 0)
+k_bec_idxs.sort()
+
+print(karr[k_bec_idxs])
+
+fbz_idxs = [i for i in range(len(karr)) if -0.5 <= karr[i] < 0.5]
 
 n_0 = np.zeros_like(Varr)
 n_bec = np.zeros_like(Varr)
 n_fbz = np.zeros_like(Varr)
 n_tot = np.zeros_like(Varr)
-
+f_c_fbz = np.zeros_like(Varr)
+f_c_tot = np.zeros_like(Varr)
 
 for i, _ in enumerate(Varr):
 
     n_0[i] = abs(FTwannier_functions[i][k_0_idx])**2
     n_bec[i] = sum(abs(FTwannier_functions[i][k_bec_idxs])**2)
-    n_fbz[i] = sum(abs(FTwannier_functions[i][fbz_idxs])**2)
-    n_tot[i] = sum(abs(FTwannier_functions[i][:])**2)
+    # Add composite peaks: 
+    n_fbz[i] = sum(dk*abs(FTwannier_functions[i][fbz_idxs])**2)
+    n_tot[i] = sum(dk*abs(FTwannier_functions[i][:])**2)
+    f_c_fbz[i] = n_0[i] / n_fbz[i]
+    f_c_tot[i] = n_bec[i] / n_tot[i]
     
 
+#%%
+
+import quantipy.lattice as latt
 
     
 #%%
