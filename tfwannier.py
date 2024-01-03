@@ -9,6 +9,7 @@ Created on Thu Dec 21 17:25:49 2023
 
 # Standard library imports:
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import lattice
 from scipy.fft import fft, fftfreq
@@ -124,22 +125,33 @@ for uj_idx, _ in enumerate(Varr):
     
 n_max = int(max(karr))
 
+miller_indices = pd.MultiIndex.from_product([
+    [-n_max + i for i in range(2 * n_max + 1)],
+    [-n_max + i for i in range(2 * n_max + 1)],
+    [-n_max + i for i in range(2 * n_max + 1)]
+    ]).to_numpy()
+
+# Filter to order n_max:
+miller_indices = miller_indices[np.where([abs(h) + abs(k) + abs(l) <= n_max for (h, k, l) in miller_indices])]
+
+mapping = {k: v for k, v in zip([-n_max + i for i in range(2 * n_max + 1)], k_bec_idxs)}
+
 for uj_idx, _ in enumerate(Varr):
     
     n_bec[uj_idx] = 0
-
-    for h_idx, h in enumerate([-n_max + l for l in range(2 * n_max + 1)]):
-
-        for k_idx, k in enumerate([-n_max + l for l in range(2 * n_max + 1)]):
-
-            for l_idx, l in enumerate([-n_max + l for l in range(2 * n_max + 1)]):
+    
+    for (h, k, l) in miller_indices:
+        
+        h_idx = mapping[h]
+        k_idx = mapping[k]
+        l_idx = mapping[l]
                 
-                if uj_idx == 0: print((h, k, l))
-                
-                n_bec[uj_idx] += (
-                    abs(FTwannier_functions[uj_idx][k_bec_idxs][h_idx]
-                    * FTwannier_functions[uj_idx][k_bec_idxs][k_idx]
-                    * FTwannier_functions[uj_idx][k_bec_idxs][l_idx])**2)
+        if uj_idx == 0: print((h, k, l))
+        
+        n_bec[uj_idx] += (
+            abs(FTwannier_functions[uj_idx][h_idx]
+            * FTwannier_functions[uj_idx][k_idx]
+            * FTwannier_functions[uj_idx][l_idx])**2)
                 
                 
 
