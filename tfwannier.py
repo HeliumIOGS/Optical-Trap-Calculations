@@ -57,31 +57,6 @@ dx = xarr[1] - xarr[0]
 
 
 
-
-
-#%%
-
-# fig, axes = plt.subplots(1, len(Varr), figsize=(14, 3), sharey=True)
-# for i, ax in enumerate(axes):
-#     ax.plot(xarr, wannier_functions[i])
-#     ax.set_xlim(-2,2)
-#     ax.set_xlabel("position")
-#     ax.text(1, 1, f"U/J = {s_vs_uj[Varr[i]]}", textprops, transform=ax.transAxes)
-# axes[0].set_ylabel("Wannier amplitude")
-# plt.subplots_adjust(wspace=.1)
-# plt.show()
-
-
-
-
-#%%
-
-dx = xarr[1] - xarr[0]
-
-# for wf in wannier_functions:
-#     print("Norm: ", np.sum(wf**2) * dx)
-
-
 # Calculate TF:
 
 T=xrange/Npoint; # sampling distance in position space
@@ -97,9 +72,8 @@ for i in range(len(Varr)):
 karr=np.concatenate((-karr[::-1],karr[1:])) # to have a symmetric plot centered on k=0
 
 
-# Calculate quantities:
+#%%
 
-<<<<<<< HEAD
 # Plot mod. square of TF:
 
 # fig, axes = plt.subplots(3, 4, figsize=(16, 2.5), sharey=True)
@@ -119,7 +93,7 @@ karr=np.concatenate((-karr[::-1],karr[1:])) # to have a symmetric plot centered 
 
 
 
-# Calculate quantities:
+#%%
 
 # Calculate quantities:
 
@@ -130,29 +104,6 @@ k_0_idx = np.where(karr==0)[0][0]
 k_bec_idxs = np.where([i.is_integer() for i in karr])[0]
 
 # print(karr[k_bec_idxs])
-dk = karr[1] - karr[0]
-
-=======
-dk = karr[1] - karr[0]
-
->>>>>>> 145c5a6afc0cc2e14a2efbf619103a7e8653a4e2
-k_0_idx = np.where(karr==0)[0][0]
-
-k_bec_idxs = np.where([i.is_integer() for i in karr])[0]
-# Add composite peaks:
-    
-def find_nearest(array, value):
-    array = np.asarray(array)
-    idx = (np.abs(array - value)).argmin()
-    return array[idx]
-
-comp_peaks_1 = np.where([abs(i) == find_nearest(karr, np.sqrt(2)) for i in karr])[0]
-comp_peaks_2 = np.where([abs(i) == find_nearest(karr, np.sqrt(5)) for i in karr])[0]
-k_bec_idxs = np.append(k_bec_idxs, comp_peaks_1, 0)
-k_bec_idxs = np.append(k_bec_idxs, comp_peaks_2, 0)
-k_bec_idxs.sort()
-
-print(karr[k_bec_idxs])
 
 fbz_idxs = [i for i in range(len(karr)) if -0.5 <= karr[i] < 0.5]
 
@@ -165,7 +116,6 @@ f_c_tot = np.zeros_like(Varr)
 
 # N_0:
 
-<<<<<<< HEAD
 for uj_idx, _ in enumerate(Varr):
 
     n_0[uj_idx] = abs(FTwannier_functions[uj_idx][k_0_idx])**2
@@ -214,43 +164,6 @@ for uj_idx, _ in enumerate(Varr):
 # Plot results as a function of U/J:
 
 fig, axs = plt.subplots(3, 1, sharex=True)
-n_0[i] = abs(FTwannier_functions[i][k_0_idx])**2
-n_bec[i] = sum(abs(FTwannier_functions[i][k_bec_idxs])**2)
-# Add composite peaks: 
-n_fbz[i] = sum(dk*abs(FTwannier_functions[i][fbz_idxs])**2)
-n_tot[i] = sum(dk*abs(FTwannier_functions[i][:])**2)
-f_c_fbz[i] = n_0[i] / n_fbz[i]
-f_c_tot[i] = n_bec[i] / n_tot[i]
-    
-
-#%%
-
-import quantipy.lattice as latt
-
-    
-#%%
-
-
-=======
-    n_0[i] = abs(FTwannier_functions[i][k_0_idx])**2
-    n_bec[i] = sum(abs(FTwannier_functions[i][k_bec_idxs])**2)
-    # Add composite peaks: 
-    n_fbz[i] = sum(dk*abs(FTwannier_functions[i][fbz_idxs])**2)
-    n_tot[i] = sum(dk*abs(FTwannier_functions[i][:])**2)
-    f_c_fbz[i] = n_0[i] / n_fbz[i]
-    f_c_tot[i] = n_bec[i] / n_tot[i]
-    
-
-#%%
-
-import quantipy.lattice as latt
-
-    
-#%%
-
-
->>>>>>> 145c5a6afc0cc2e14a2efbf619103a7e8653a4e2
-fig, axs = plt.subplots(1, 2)
 axs[0].plot(
     sorted(uj_vs_s.keys()),
     n_0,
@@ -271,7 +184,6 @@ axs[1].plot(
     n_tot,
     label=r'$N_{\mathrm{tot}}$'
     )
-<<<<<<< HEAD
 axs[2].plot(
     sorted(uj_vs_s.keys()),
     f_c_fbz,
@@ -288,11 +200,6 @@ for idx, ax in enumerate(axs):
         ax.set_ylabel(r'$f_c$')
     else:
         ax.set_ylabel(r'$\int\mathrm{d}\mathbf{k} |\omega (\mathbf{k})|^2$')
-=======
->>>>>>> 145c5a6afc0cc2e14a2efbf619103a7e8653a4e2
-for ax in axs:
-    ax.set_xlabel('U/J')
-    ax.set_ylabel(r'$\int _{\mathrm{FBZ}} \mathrm{d}\mathbf{k} |\omega (\mathbf{k})|^2$')
     ax.legend()
     ax.set_axisbelow(True)    
     ax.xaxis.grid(color='gray', linestyle='dashed', linewidth=0.3)
