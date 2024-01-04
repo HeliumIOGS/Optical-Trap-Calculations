@@ -72,3 +72,6 @@ py3*/
 
 # QMC simulations
 data/qmc
+
+# iCloud files
+.DS_Store
