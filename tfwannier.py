@@ -9,6 +9,7 @@ Created on Thu Dec 21 17:25:49 2023
 
 # Standard library imports:
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import lattice
 from scipy.fft import fft, fftfreq
@@ -99,9 +100,15 @@ karr=np.concatenate((-karr[::-1],karr[1:])) # to have a symmetric plot centered 
 
 dk = karr[1] - karr[0]
 
-k_0_idx = np.where(karr==0)[0][0]
-
 k_bec_idxs = np.where([i.is_integer() for i in karr])[0]
+
+pw = 0.15  # k_d
+
+pw_dk = int(np.round(pw / dk))
+
+k_bec_idxs_int = np.array([np.arange(i - pw_dk, i + pw_dk + 1) for i in k_bec_idxs])
+
+print(karr[k_bec_idxs_int])
 
 # print(karr[k_bec_idxs])
 
@@ -118,34 +125,44 @@ f_c_tot = np.zeros_like(Varr)
 
 for uj_idx, _ in enumerate(Varr):
 
-    n_0[uj_idx] = abs(FTwannier_functions[uj_idx][k_0_idx])**2
+    n_0[uj_idx] = sum(dk*abs(FTwannier_functions[uj_idx][k_bec_idxs_int[2]])**2)**3
 
 # N_BEC:
     
 n_max = int(max(karr))
 
+miller_indices = pd.MultiIndex.from_product([
+    [-n_max + l for l in range(2 * n_max + 1)],
+    [-n_max + l for l in range(2 * n_max + 1)],
+    [-n_max + l for l in range(2 * n_max + 1)]
+    ]).to_numpy()
+
+miller_indices = miller_indices[np.where([abs(h) + abs(k) + abs(l) <= n_max for (h, k, l) in miller_indices])]
+
+mapping = {k: v for k, v in enumerate(k_bec_idxs)}
+
 for uj_idx, _ in enumerate(Varr):
     
     n_bec[uj_idx] = 0
+    
+    for (h, k, l) in miller_indices:
 
-    for h_idx, h in enumerate([-n_max + l for l in range(2 * n_max + 1)]):
+        h_idx = k_bec_idxs_int[h]
+        k_idx = k_bec_idxs_int[k]
+        l_idx = k_bec_idxs_int[l]
+        
+        if uj_idx == 0: print((karr[h_idx], karr[k_idx], karr[l_idx]))
 
-        for k_idx, k in enumerate([-n_max + l for l in range(2 * n_max + 1)]):
-
-            for l_idx, l in enumerate([-n_max + l for l in range(2 * n_max + 1)]):
+        n_bec[uj_idx] += (
+            sum(dk*abs(FTwannier_functions[uj_idx][h_idx])**2)
+            * sum(dk*abs(FTwannier_functions[uj_idx][k_idx])**2)
+            * sum(dk*abs(FTwannier_functions[uj_idx][l_idx])**2))
                 
-                if uj_idx == 0: print((h, k, l))
-                
-                n_bec[uj_idx] += (
-                    abs(FTwannier_functions[uj_idx][k_bec_idxs][h_idx]
-                    * FTwannier_functions[uj_idx][k_bec_idxs][k_idx]
-                    * FTwannier_functions[uj_idx][k_bec_idxs][l_idx])**2)
-                
                 
 
 
-    n_fbz[uj_idx] = sum(dk*abs(FTwannier_functions[uj_idx][fbz_idxs]**3)**2)
-    n_tot[uj_idx] = sum(dk*abs(FTwannier_functions[uj_idx][:]**3)**2)
+    n_fbz[uj_idx] = (sum(dk*abs(FTwannier_functions[uj_idx][fbz_idxs])**2))**3
+    n_tot[uj_idx] = (sum(dk*abs(FTwannier_functions[uj_idx][:])**2))**3
     
     
 # Normalize:
@@ -198,6 +215,7 @@ for idx, ax in enumerate(axs):
     if idx==len(axs)-1:
         ax.set_xlabel('U/J')
         ax.set_ylabel(r'$f_c$')
+    
     else:
         ax.set_ylabel(r'$\int\mathrm{d}\mathbf{k} |\omega (\mathbf{k})|^2$')
     ax.legend()
