@@ -152,23 +152,8 @@ for uj_idx, _ in enumerate(Varr):
             * abs(FTwannier_functions[uj_idx][k_idx])**2
             * abs(FTwannier_functions[uj_idx][l_idx])**2)
                 
-                
-
-
     n_fbz[uj_idx] = (sum(dk*abs(FTwannier_functions[uj_idx][fbz_idxs])**2))**3
     n_tot[uj_idx] = (sum(dk*abs(FTwannier_functions[uj_idx][:])**2))**3
-    
-    
-# Normalize:
-# n_0 = n_0 / n_tot * 1
-# n_bec = n_bec / n_tot * 1
-# n_fbz = n_fbz / n_tot * 1
-# n_tot = n_tot / n_tot * 1
-
-for uj_idx, _ in enumerate(Varr):
-
-   f_c_fbz[uj_idx] = n_0[uj_idx] / n_fbz[uj_idx]
-   f_c_tot[uj_idx] = n_bec[uj_idx] / n_tot[uj_idx]
    
 #%%
 
