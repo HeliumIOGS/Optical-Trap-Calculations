@@ -179,22 +179,22 @@ fig, axs = plt.subplots(2, 1, sharex=True)
 axs[0].plot(
     sorted(uj_vs_s.keys()),
     n_0,
-    label=r'$|\tilde{w}(0)|^6$'
+    label=r'$N_0 \sim |\tilde{w}(0)|^6$'
     )
 axs[0].plot(
     sorted(uj_vs_s.keys()),
     n_bec,
-    label=r'$|\tilde{w}(\mathbf{k}_{\mathrm{diffr}})|^2$'
+    label=r'$N_{\mathrm{BEC}} \sim |\tilde{w}(\mathbf{k}_{\mathrm{diffr}})|^2$'
     )
 axs[1].plot(
     sorted(uj_vs_s.keys()),
     n_fbz,
-    label=r'$\left( \int_{-k_d/2}^{k_d/2}\mathrm{d}k |\omega (k)|^2 \right)^3$'
+    label=r'$N_{\mathrm{FBZ}} \sim \left( \int_{-k_d/2}^{k_d/2}\mathrm{d}k |\omega (k)|^2 \right)^3$'
     )
 axs[1].plot(
     sorted(uj_vs_s.keys()),
     n_tot,
-    label=r'$\left( \int_{-\infty}^{\infty}\mathrm{d}k |\omega (k)|^2 \right)^3$'
+    label=r'$N_{\mathrm{tot}} \sim \left( \int_{-\infty}^{\infty}\mathrm{d}k |\omega (k)|^2 \right)^3$'
     )
 # axs[2].plot(
 #     sorted(uj_vs_s.keys()),
