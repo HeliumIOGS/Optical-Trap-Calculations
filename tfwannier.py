@@ -100,15 +100,9 @@ karr=np.concatenate((-karr[::-1],karr[1:])) # to have a symmetric plot centered 
 
 dk = karr[1] - karr[0]
 
+k_0_idx = np.where(karr==0)[0][0]
+
 k_bec_idxs = np.where([i.is_integer() for i in karr])[0]
-
-pw = 0.15  # k_d
-
-pw_dk = int(np.round(pw / dk))
-
-k_bec_idxs_int = np.array([np.arange(i - pw_dk, i + pw_dk + 1) for i in k_bec_idxs])
-
-print(karr[k_bec_idxs_int])
 
 # print(karr[k_bec_idxs])
 
@@ -125,7 +119,7 @@ f_c_tot = np.zeros_like(Varr)
 
 for uj_idx, _ in enumerate(Varr):
 
-    n_0[uj_idx] = sum(dk*abs(FTwannier_functions[uj_idx][k_bec_idxs_int[2]])**2)**3
+    n_0[uj_idx] = abs(FTwannier_functions[uj_idx][k_0_idx])**2
 
 # N_BEC:
     
@@ -139,7 +133,7 @@ miller_indices = pd.MultiIndex.from_product([
 
 miller_indices = miller_indices[np.where([abs(h) + abs(k) + abs(l) <= n_max for (h, k, l) in miller_indices])]
 
-mapping = {k: v for k, v in enumerate(k_bec_idxs)}
+mapping = {k: v for k, v in zip([-n_max + i for i in range(2 * n_max + 1)], k_bec_idxs)}
 
 for uj_idx, _ in enumerate(Varr):
     
@@ -147,16 +141,16 @@ for uj_idx, _ in enumerate(Varr):
     
     for (h, k, l) in miller_indices:
 
-        h_idx = k_bec_idxs_int[h]
-        k_idx = k_bec_idxs_int[k]
-        l_idx = k_bec_idxs_int[l]
+        h_idx = mapping[h]
+        k_idx = mapping[k]
+        l_idx = mapping[l]
         
-        if uj_idx == 0: print((karr[h_idx], karr[k_idx], karr[l_idx]))
+        if uj_idx == 0: print((int(karr[h_idx]), int(karr[k_idx]), int(karr[l_idx])))
 
         n_bec[uj_idx] += (
-            sum(dk*abs(FTwannier_functions[uj_idx][h_idx])**2)
-            * sum(dk*abs(FTwannier_functions[uj_idx][k_idx])**2)
-            * sum(dk*abs(FTwannier_functions[uj_idx][l_idx])**2))
+            abs(FTwannier_functions[uj_idx][h_idx])**2
+            * abs(FTwannier_functions[uj_idx][k_idx])**2
+            * abs(FTwannier_functions[uj_idx][l_idx])**2)
                 
                 
 
@@ -180,44 +174,45 @@ for uj_idx, _ in enumerate(Varr):
 
 # Plot results as a function of U/J:
 
-fig, axs = plt.subplots(3, 1, sharex=True)
+# fig, axs = plt.subplots(3, 1, sharex=True)
+fig, axs = plt.subplots(2, 1, sharex=True)
 axs[0].plot(
     sorted(uj_vs_s.keys()),
     n_0,
-    label=r'$N_0$'
+    label=r'$|\tilde{w}(0)|^6$'
     )
 axs[0].plot(
     sorted(uj_vs_s.keys()),
     n_bec,
-    label=r'$N_{\mathrm{BEC}}$'
+    label=r'$|\tilde{w}(\mathbf{k}_{\mathrm{diffr}})|^2$'
     )
 axs[1].plot(
     sorted(uj_vs_s.keys()),
     n_fbz,
-    label=r'$N_{\mathrm{FBZ}}$'
+    label=r'$\left( \int_{-k_d/2}^{k_d/2}\mathrm{d}k |\omega (k)|^2 \right)^3$'
     )
 axs[1].plot(
     sorted(uj_vs_s.keys()),
     n_tot,
-    label=r'$N_{\mathrm{tot}}$'
+    label=r'$\left( \int_{-\infty}^{\infty}\mathrm{d}k |\omega (k)|^2 \right)^3$'
     )
-axs[2].plot(
-    sorted(uj_vs_s.keys()),
-    f_c_fbz,
-    label=r'$N_0 / N_{\mathrm{FBZ}}$'
-    )
-axs[2].plot(
-    sorted(uj_vs_s.keys()),
-    f_c_tot,
-    label=r'$N_{\mathrm{BEC}} / N_{\mathrm{tot}}$'
-    )
+# axs[2].plot(
+#     sorted(uj_vs_s.keys()),
+#     f_c_fbz,
+#     label=r'$N_0 / N_{\mathrm{FBZ}}$'
+#     )
+# axs[2].plot(
+#     sorted(uj_vs_s.keys()),
+#     f_c_tot,
+#     label=r'$N_{\mathrm{BEC}} / N_{\mathrm{tot}}$'
+#     )
 for idx, ax in enumerate(axs):
     if idx==len(axs)-1:
         ax.set_xlabel('U/J')
-        ax.set_ylabel(r'$f_c$')
-    
-    else:
+        # ax.set_ylabel(r'$f_c$')
         ax.set_ylabel(r'$\int\mathrm{d}\mathbf{k} |\omega (\mathbf{k})|^2$')
+    else:
+        ax.set_ylabel(r'$|\omega (\mathbf{k})|^2$')
     ax.legend()
     ax.set_axisbelow(True)    
     ax.xaxis.grid(color='gray', linestyle='dashed', linewidth=0.3)
