@@ -66,7 +66,7 @@ for s, uj in zip(Varr, eff_mass.index):
     Er=lattice.recoilenergy(d_latt,m)
     # print(f"Recoil energy of lattice Er= {Er/h/1e3:.3f} kHz")
     
-    U, J = [], []
+    # U, J = [], []
     e, bs = lattice.eigenproblem(s, qarr, bands=n)
     U=gHe*(lattice.hubbardU(xsampl, bs, scale=d_latt))**3 # cubic power for 3D problem
     J=Er*lattice.hubbardJ(e, d=1)
@@ -99,6 +99,58 @@ for s, uj in zip(Varr, eff_mass.index):
     
 #%%
 
+s = np.linspace(5, 15)
+uj = pd.DataFrame(index=s, columns=['U', 'J', 'U/J'], dtype=float)
+
+for s_ in s:
+    
+    e, bs = lattice.eigenproblem(s_, qarr, bands=n)
+    U=gHe*(lattice.hubbardU(xsampl, bs, scale=d_latt))**3 # cubic power for 3D problem
+    J=Er*lattice.hubbardJ(e, d=1)
+    
+    uj.loc[s_] = pd.Series({'U': U / Er, 'J': J / Er, 'U/J': U / J})
+    
+
+
+#%%
+fig, axs = plt.subplots(2, 1, sharex=True)
+axs[0].semilogy(
+    s,
+    uj['U'],
+    label=r'$U$'
+    )
+axs[0].semilogy(
+    s,
+    uj['J'],
+    label=r'$J$'
+    )
+axs[1].plot(
+    s,
+    uj['U/J'],
+    label=r'$U/J$',
+    color='g'
+    )
+axs[1].scatter(
+    sorted(uj_vs_s.values()),
+    sorted(uj_vs_s.keys()),
+    marker='x',
+    label='Exp',
+    color='k'
+    )
+axs[-1].set_xlabel(r'$s\ [E_r]$')
+axs[0].set_ylabel(r'$E\ [E_r]$')
+axs[1].set_ylabel(r'$U/J$')
+for ax in axs:
+    ax.legend()
+    ax.set_axisbelow(True)    
+    ax.xaxis.grid(color='gray', linestyle='dashed', linewidth=0.3)
+    ax.yaxis.grid(color='gray', linestyle='dashed', linewidth=0.3)
+    ax.grid(visible=True)
+plt.show()
+
+    
+#%%
+
 # Plot results as a function of U/J:
 fig, axs = plt.subplots(4, 2, sharex='col', sharey='row')
 
@@ -106,12 +158,12 @@ for col_idx, x_ax in enumerate([Varr, eff_mass.index]):
     axs[0][col_idx].plot(
         x_ax,
         eff_mass/m,
-        label=r'$m*/m$'
+        label=r'$m*/m = \hbar ^2 / (2 J d_{\mathrm{latt}}^2 m)$'
         )
     axs[1][col_idx].plot(
         x_ax,
         speed_of_sound,
-        label=r'$c$'
+        label=r'$c = 1 / \sqrt{\kappa m*} \propto \sqrt{U N_0 / (N m*)}$'
         )
     axs[2][col_idx].plot(
         x_ax,
@@ -121,7 +173,7 @@ for col_idx, x_ax in enumerate([Varr, eff_mass.index]):
     axs[3][col_idx].plot(
         x_ax,
         fluct/fluct.max(),
-        label=r'$\Delta N_0^2 \propto (n_0mc)^2$'
+        label=r'$\Delta N_0^2 \propto (mc)^2$'
         )
     if col_idx == 0:
         axs[-1][col_idx].set_xlabel('s')
