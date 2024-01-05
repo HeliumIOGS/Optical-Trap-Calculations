@@ -31,8 +31,8 @@ Er = lattice.recoilenergy(d_latt,m)
 
 # Set up lattice parameters:
 n = 0  # Band index
-xarr = np.linspace(-1.5, 1.5, 200)  # Real-space position
 size = 100  # Number of lattice sites
+xarr = np.linspace(-1.5, 1.5, 200)  # Real-space position
 qarr = lattice.quasimomenta(size)  # Quasimomenta
 sarr = np.linspace(5, 14.2, 100) # Test values for lattice amplitude
 
